@@ -218,21 +218,27 @@ body.cinematic-ui-hidden #hud-bottom {
 #checkmate-overlay {
   position: fixed;
   inset: 0;
-  z-index: 24;
+  z-index: 42;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  padding-top: 78px;
+  justify-content: center;
+  padding: 20px;
+  background: radial-gradient(
+    circle at 50% 45%,
+    rgba(10, 12, 22, 0.38) 0%,
+    rgba(4, 6, 12, 0.72) 100%
+  );
   pointer-events: none;
   opacity: 0;
   transform: translateY(-12px) scale(0.97);
-  transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1), transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1), transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 #checkmate-overlay.visible {
   opacity: 1;
   transform: translateY(0) scale(1);
+  pointer-events: auto;
 }
 
 #checkmate-overlay.visible .checkmate-banner {
@@ -695,14 +701,15 @@ body.cinematic-ui-hidden #hud-bottom {
 
   /* Responsive Checkmate Banner on mobile screens */
   #checkmate-overlay {
-    padding-top: 64px;
+    padding: 16px;
+    justify-content: center;
   }
 
   .checkmate-banner {
     min-width: 0;
     width: calc(100vw - 24px);
     max-width: 420px;
-    padding: 18px 18px 16px;
+    padding: 22px 18px 18px;
   }
 
   .checkmate-title {

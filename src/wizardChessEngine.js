@@ -2609,10 +2609,10 @@ export function initWizardChess() {
 
         currentTurn = currentTurn === 'w' ? 'b' : 'w';
         isAnimatingMove = false;
-        if (gameMode === 'human') {
+        updateTurnUI();
+        if (gameMode === 'human' && !gameOver) {
           setCameraForSide(currentTurn, false);
         }
-        updateTurnUI();
         maybeScheduleAIMove();
       }
 
@@ -3506,7 +3506,7 @@ export function initWizardChess() {
       impactFlashLight.intensity = 6.2;
     }
 
-    function showCheckmateBanner(winnerColor, defeatedColor) {
+    function showCheckmateBanner(winnerColor, defeatedColor, customTitle = null, customSubtitle = null) {
       const overlay = document.getElementById('checkmate-overlay');
       const crownEl = document.getElementById('checkmate-crown');
       const titleEl = document.getElementById('checkmate-title');
@@ -3515,10 +3515,11 @@ export function initWizardChess() {
       const winnerName = winnerColor === 'w' ? 'White' : 'Black';
       const defeatedName = defeatedColor === 'w' ? 'White' : 'Black';
 
-      if (crownEl) crownEl.textContent = winnerColor === 'w' ? '♔' : '♚';
-      if (titleEl) titleEl.textContent = 'Checkmate';
+      if (crownEl) crownEl.textContent = winnerColor === 'b' ? '♚' : '♔';
+      if (titleEl) titleEl.textContent = customTitle || 'Checkmate';
       if (subEl) {
-        subEl.textContent = `${winnerName} Triumphs • The ${defeatedName} King Has Fallen`;
+        subEl.textContent =
+          customSubtitle || `${winnerName} Triumphs • The ${defeatedName} King Has Fallen`;
       }
       if (overlay) {
         overlay.classList.add('visible');
@@ -3551,8 +3552,10 @@ export function initWizardChess() {
       checkmateState.kingFallAngleDeg = 0;
       checkmateState.phase = 'stagger';
 
+      // Show the Checkmate screen immediately so it is always visible as the King topples
+      showCheckmateBanner(actualWinner, defeatedColor);
+
       if (!kingPiece || !kingPiece.mesh) {
-        showCheckmateBanner(actualWinner, defeatedColor);
         return false;
       }
 
@@ -3786,17 +3789,22 @@ export function initWizardChess() {
       if (legalMoves.length === 0) {
         gameOver = true;
         if (inCheck) {
+          const winnerColor = currentTurn === 'w' ? 'b' : 'w';
           const winner = currentTurn === 'w' ? 'Black' : 'White';
           turnText.textContent = `CHECKMATE — ${winner.toUpperCase()} WINS`;
           if (!checkmateState.active) {
-            triggerCheckmateSequence(currentTurn, currentTurn === 'w' ? 'b' : 'w');
+            triggerCheckmateSequence(currentTurn, winnerColor);
+          } else {
+            showCheckmateBanner(winnerColor, currentTurn);
           }
         } else {
           turnText.textContent = 'STALEMATE — DRAW';
+          showCheckmateBanner('w', 'b', 'Stalemate', 'Match Drawn • No Legal Moves Remaining');
         }
       } else if (isInsufficientMaterial()) {
         gameOver = true;
         turnText.textContent = 'DRAW — INSUFFICIENT MATERIAL';
+        showCheckmateBanner('w', 'b', 'Draw', 'Match Drawn • Insufficient Checkmating Material');
       } else {
         const turnLabel = currentTurn === 'w' ? 'WHITE TO MOVE' : 'BLACK TO MOVE';
         const aiColor = playerColor === 'w' ? 'b' : 'w';
@@ -4564,6 +4572,9 @@ export function initWizardChess() {
 
     document.getElementById('btn-checkmate-stepback')?.addEventListener('click', () => {
       stepScriptBackward();
+    });
+    document.getElementById('btn-checkmate-undo')?.addEventListener('click', () => {
+      undoLastMove();
     });
     document.getElementById('btn-checkmate-replay')?.addEventListener('click', () => {
       const defCol = checkmateState.defeatedColor || currentTurn;

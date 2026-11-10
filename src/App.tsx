@@ -546,24 +546,24 @@ export default function App() {
             White Triumphs • The Black King Has Fallen
           </div>
           <div className="checkmate-actions">
-            <button className="checkmate-btn" id="btn-checkmate-replay">
+            <button className="checkmate-btn" id="btn-checkmate-replay" type="button">
               Replay King Fall
             </button>
-            <button className="checkmate-btn" id="btn-checkmate-newgame">
-              Restart Game
+            <button className="checkmate-btn" id="btn-checkmate-newgame" type="button">
+              Play Again
+            </button>
+            <button className="checkmate-btn secondary" id="btn-checkmate-undo" type="button">
+              Undo Move
             </button>
             <button
               className="checkmate-btn secondary"
               type="button"
               onClick={() => {
-                document.getElementById('checkmate-overlay')?.classList.remove('visible');
+                getEngine()?.resetChessBoard?.(true, false);
                 setMenuOpen(true);
               }}
             >
               Main Menu
-            </button>
-            <button className="checkmate-btn secondary" id="btn-checkmate-dismiss">
-              Dismiss
             </button>
           </div>
         </div>
